@@ -30,7 +30,7 @@ export function normalizeForMatch(word: string): string {
     .toLowerCase()
     .replace(/ς/g, "σ")
     .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
+    .replace(/[̀-֑ͯ-ׇ]/g, "")
     .trim();
 }
 

@@ -51,8 +51,8 @@ pub fn normalize_word(word: &str) -> String {
     let mut out = String::with_capacity(word.len());
     for c in word.trim().chars().flat_map(|c| c.to_lowercase()) {
         let u = c as u32;
-        if (0x0300..=0x036f).contains(&u) {
-            continue; // marca combinante (ex.: İ → i + ponto)
+        if (0x0300..=0x036f).contains(&u) || (0x0591..=0x05C7).contains(&u) {
+            continue; // marca combinante (ex.: İ → i + ponto; niqqud בְּ → ב)
         }
         if let Some(b) = strip_latin_precomposed(c) {
             out.push(b);
@@ -250,5 +250,26 @@ mod tests {
         assert!(wordlist_contains("el", "θεός"));
         assert!(!wordlist_contains("koine", "XQZKWJQQ"));
         assert!(!wordlist_contains("el", "XQZKWJQQ"));
+    }
+
+    #[test]
+    fn normalization_hebrew_strips_niqqud() {
+        // Niqqud e cantilação somem; sofit é preservada (letra distinta).
+        assert_eq!(normalize_word("בְּרֵאשִׁית"), "בראשית");
+        assert_eq!(normalize_word("שָׁלוֹם"), "שלום");
+        assert_eq!(normalize_word("  יְהוָה  "), "יהוה");
+    }
+
+    #[test]
+    fn he_tanakh_contain_common_words() {
+        // Tanakh (OSHB/WLC): formas com prefixo e segmentos casam.
+        assert!(wordlist_contains("tanakh", "בראשית"));
+        assert!(wordlist_contains("tanakh", "שלום"));
+        assert!(wordlist_contains("tanakh", "יהוה"));
+        // Moderno (hunspell, formas-base).
+        assert!(wordlist_contains("he", "שלום"));
+        assert!(wordlist_contains("he", "תורה"));
+        assert!(!wordlist_contains("tanakh", "XQZKWJQQ"));
+        assert!(!wordlist_contains("he", "XQZKWJQQ"));
     }
 }

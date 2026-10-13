@@ -70,6 +70,34 @@
       "description": "Vocabulário do NT (formas + lemas) para filtrar combinações geradas. Sem descrições (verbetes curados continuam no dicionário hermético embutido).",
       "source": "MorphGNT SBLGNT Edition (Tauber 2017); texto sob SBLGNT EULA, morfologia CC-BY-SA 3.0",
       "license": "Ver dictionaries/koine/README.md"
+    },
+    {
+      "id": "he",
+      "name": "Hebraico Moderno (filtro)",
+      "lang": "he",
+      "alphabet": "Hebraico",
+      "kind": "filter",
+      "version": "1.0.0",
+      "file": "he/words.txt",
+      "entries": 447303,
+      "normalization": "sem niqqud (U+0591–U+05C7 removidos), sofit preservada (א-ת)",
+      "description": "Wordlist de formas-base para filtrar combinações geradas (só ≤10 letras, limite do motor). Sem descrições (verbetes curados continuam no dicionário hermético embutido).",
+      "source": "hunspell-he (formas-base do .dic; unmunch expandiria p/ 62M — inviável)",
+      "license": "Ver dictionaries/he/README.md"
+    },
+    {
+      "id": "tanakh",
+      "name": "Hebraico Bíblico — Tanakh (filtro)",
+      "lang": "hbo",
+      "alphabet": "Hebraico",
+      "kind": "filter",
+      "version": "1.0.0",
+      "file": "tanakh/words.txt",
+      "entries": 45224,
+      "normalization": "sem niqqud (U+0591–U+05C7 removidos), sofit preservada (א-ת)",
+      "description": "Vocabulário do Tanakh (segmentos + formas plenas) para filtrar combinações geradas. Sem descrições (verbetes curados continuam no dicionário hermético embutido).",
+      "source": "Open Scriptures Hebrew Bible (WLC domínio público, morfologia CC-BY 4.0)",
+      "license": "Ver dictionaries/tanakh/README.md"
     }
   ]
 }
