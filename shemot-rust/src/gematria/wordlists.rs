@@ -54,12 +54,81 @@ pub fn normalize_word(word: &str) -> String {
         if (0x0300..=0x036f).contains(&u) {
             continue; // marca combinante (ex.: İ → i + ponto)
         }
-        match strip_latin_precomposed(c) {
-            Some(b) => out.push(b),
-            None => out.push(c),
+        if let Some(b) = strip_latin_precomposed(c) {
+            out.push(b);
+            continue;
         }
+        if let Some(b) = strip_greek_precomposed(c) {
+            out.push(b);
+            continue;
+        }
+        out.push(c);
     }
     out
+}
+
+/// Equivalente ao NFD + remoção de \u0300-\u036f do TS para o grego:
+/// reduz pré-compostos monotônicos e o bloco Greek Extended (politônicos,
+/// ex.: NT SBLGNT) à vogal base; ς (sigma final) vira σ para casar com
+/// consultas e listas. Aplica-se após to_lowercase (maiúsculas já caíram
+/// nas faixas minúsculas), mas as faixas cobrem maiúsculas por segurança.
+fn strip_greek_precomposed(c: char) -> Option<char> {
+    match c {
+        'ά' | 'ὰ' | 'ᾶ' => Some('α'),
+        'έ' | 'ὲ' => Some('ε'),
+        'ή' | 'ὴ' | 'ῆ' => Some('η'),
+        'ί' | 'ὶ' | 'ῖ' | 'ϊ' | 'ΐ' => Some('ι'),
+        'ό' | 'ὸ' => Some('ο'),
+        'ύ' | 'ὺ' | 'ῦ' | 'ϋ' | 'ΰ' => Some('υ'),
+        'ώ' | 'ὼ' | 'ῶ' => Some('ω'),
+        'ς' => Some('σ'),
+        _ => {
+            let u = c as u32;
+            if (0x1F00..=0x1F0F).contains(&u) {
+                Some('α')
+            } else if (0x1F10..=0x1F1F).contains(&u) {
+                Some('ε')
+            } else if (0x1F20..=0x1F2F).contains(&u) {
+                Some('η')
+            } else if (0x1F30..=0x1F3F).contains(&u) {
+                Some('ι')
+            } else if (0x1F40..=0x1F4F).contains(&u) {
+                Some('ο')
+            } else if (0x1F50..=0x1F57).contains(&u) || (0x1F59..=0x1F5F).contains(&u) {
+                Some('υ')
+            } else if (0x1F60..=0x1F6F).contains(&u) {
+                Some('ω')
+            } else if (0x1F80..=0x1F8F).contains(&u) {
+                Some('α') // + ypogegrammeni
+            } else if (0x1F90..=0x1F9F).contains(&u) {
+                Some('η') // + ypogegrammeni
+            } else if (0x1FA0..=0x1FAF).contains(&u) {
+                Some('ω') // + ypogegrammeni
+            } else if (0x1FB0..=0x1FBB).contains(&u) || c == '\u{1FBC}' {
+                Some('α')
+            } else if (0x1FC2..=0x1FC7).contains(&u) || c == '\u{1FCC}' {
+                Some('η')
+            } else if (0x1FC8..=0x1FCB).contains(&u) {
+                Some('ε')
+            } else if (0x1FD0..=0x1FD3).contains(&u)
+                || (0x1FD6..=0x1FDB).contains(&u)
+            {
+                Some('ι')
+            } else if (0x1FE0..=0x1FE3).contains(&u)
+                || (0x1FE6..=0x1FEB).contains(&u)
+            {
+                Some('υ')
+            } else if (0x1FE4..=0x1FE5).contains(&u) || (0x1FEC..=0x1FEF).contains(&u) {
+                Some('ρ') // rô com espírito (ex.: ῥήτωρ)
+            } else if (0x1FF2..=0x1FF7).contains(&u) || c == '\u{1FFC}' {
+                Some('ω')
+            } else if (0x1FF8..=0x1FFB).contains(&u) {
+                Some('ο')
+            } else {
+                None
+            }
+        }
+    }
 }
 
 fn sets() -> &'static HashMap<&'static str, HashSet<String>> {
@@ -120,6 +189,18 @@ mod tests {
     }
 
     #[test]
+    fn normalization_greek_matches_typescript() {
+        // Politônicos (NT) e monotônicos reduzem à base; ς final vira σ.
+        assert_eq!(normalize_word("ἀγάπη"), "αγαπη");
+        assert_eq!(normalize_word("ΛΌΓΟΣ"), "λογοσ");
+        assert_eq!(normalize_word("Ὀδυσσεύς"), "οδυσσευσ");
+        assert_eq!(normalize_word("καὶ"), "και");
+        assert_eq!(normalize_word("ᾨ"), "ω");
+        assert_eq!(normalize_word("Ῥώμη"), "ρωμη");
+        assert_eq!(normalize_word("  ἘΝ ἈΡΧῇ  "), "εν αρχη");
+    }
+
+    #[test]
     fn registry_embeds_ptbr() {
         assert!(wordlist_ids().contains(&"pt-BR"));
     }
@@ -155,5 +236,19 @@ mod tests {
         assert!(wordlist_contains("es", "corazón"));
         assert!(!wordlist_contains("en", "XQZKWJQQ"));
         assert!(!wordlist_contains("es", "XQZKWJQQ"));
+    }
+
+    #[test]
+    fn el_koine_contain_common_words() {
+        // Koiné (SBLGNT): Jo 1.1 — consulta politônica e monotônica casam.
+        assert!(wordlist_contains("koine", "ΛΟΓΟΣ"));
+        assert!(wordlist_contains("koine", "λόγος"));
+        assert!(wordlist_contains("koine", "ΘΕΟΣ"));
+        assert!(wordlist_contains("koine", "ἀγάπη"));
+        // Moderno (hunspell-el, formas plenas).
+        assert!(wordlist_contains("el", "ΑΓΑΠΗ"));
+        assert!(wordlist_contains("el", "θεός"));
+        assert!(!wordlist_contains("koine", "XQZKWJQQ"));
+        assert!(!wordlist_contains("el", "XQZKWJQQ"));
     }
 }

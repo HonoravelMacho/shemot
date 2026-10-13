@@ -49,11 +49,16 @@ export interface SaveResult {
 /**
  * Salva um .txt via APIs nativas do Tauri.
  * - Desktop: diálogo "Salvar como" (plugin-dialog) + escrita (plugin-fs).
- * - Android: comando Rust `save_text_file_native` — tenta Downloads público
- *   e cai para a pasta privada do app (scoped storage do Android 10+ barra
- *   escrita direta em Downloads; a pasta do app é sempre gravável).
- *   A UI deve oferecer "Compartilhar" (shareTextAsFile) para levar o
- *   arquivo a Downloads/Drive/WhatsApp a partir da pasta do app.
+ * - Android: diálogo `save()` do plugin-dialog — abre o seletor de
+ *   documentos do sistema (SAF/ACTION_CREATE_DOCUMENT), onde o usuário
+ *   escolhe a pasta e edita o nome; retorna um `content://` URI que o
+ *   plugin-fs consegue gravar (o path entra no escopo do fs).
+ *   Sem `filters` no Android (a plataforma não suporta filtro por extensão)
+ *   e sempre com `defaultPath` (sem ele o Android usa "(invalid).txt").
+ *   Se o diálogo falhar, cai para o comando Rust `save_text_file_native`
+ *   (Downloads → pasta do app). A UI deve oferecer "Compartilhar"
+ *   (shareTextAsFile) como alternativa para levar o arquivo a
+ *   Downloads/Drive/WhatsApp.
  * Retorna ok:false para a UI oferecer o fallback de copiar o texto.
  */
 export async function saveTextFileNative(
@@ -73,25 +78,38 @@ export async function saveTextFileNative(
       return { ok: true, path, error: "" };
     }
 
-    // Android (Tauri): comando Rust com fallback interno
-    // Downloads → pasta do app. Nunca usa o diálogo (inexistente no mobile).
+    // Android (Tauri): seletor nativo de pasta (SAF) com nome editável.
     try {
-      const { invoke } = await import("@tauri-apps/api/core");
-      const path = await invoke<string>("save_text_file_native", {
-        filename,
-        contents,
+      const { save } = await import("@tauri-apps/plugin-dialog");
+      const path = await save({
+        defaultPath: filename,
+        title: "Salvar busca (.txt)",
       });
+      if (!path) return { ok: false, path: "", error: "cancelado pelo usuário" };
+      const { writeTextFile } = await import("@tauri-apps/plugin-fs");
+      await writeTextFile(path, contents);
       return { ok: true, path, error: "" };
     } catch (e) {
-      // Fallback direto via plugin-fs (pasta privada, sempre permitida
-      // após a capability $APPDATA/**).
-      const { writeTextFile, BaseDirectory } = await import(
-        "@tauri-apps/plugin-fs"
-      );
-      await writeTextFile(filename, contents, {
-        baseDir: BaseDirectory.AppData,
-      });
-      return { ok: true, path: `pasta do app/${filename}`, error: "" };
+      // Fallback: comando Rust (Downloads público → pasta do app),
+      // para aparelhos onde o diálogo não está disponível.
+      try {
+        const { invoke } = await import("@tauri-apps/api/core");
+        const path = await invoke<string>("save_text_file_native", {
+          filename,
+          contents,
+        });
+        return { ok: true, path, error: "" };
+      } catch (e2) {
+        // Último recurso via plugin-fs (pasta privada, sempre permitida
+        // após a capability $APPDATA/**).
+        const { writeTextFile, BaseDirectory } = await import(
+          "@tauri-apps/plugin-fs"
+        );
+        await writeTextFile(filename, contents, {
+          baseDir: BaseDirectory.AppData,
+        });
+        return { ok: true, path: `pasta do app/${filename}`, error: "" };
+      }
     }
   } catch (e) {
     return { ok: false, path: "", error: String(e) };

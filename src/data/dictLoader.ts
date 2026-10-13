@@ -28,8 +28,9 @@ interface Registry {
 export function normalizeForMatch(word: string): string {
   return word
     .toLowerCase()
+    .replace(/ς/g, "σ")
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[̀-ͯ]/g, "")
     .trim();
 }
 

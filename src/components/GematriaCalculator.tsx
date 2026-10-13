@@ -1892,11 +1892,11 @@ export default function GematriaCalculator() {
     setIsSaving(true);
     try {
       // 1) Runtime Tauri (desktop + Android): salvamento nativo.
-      //    No desktop o plugin-dialog abre o explorador "Salvar como" com
-      //    o nome sugerido (editável lá também). No Android o comando Rust
-      //    grava em Downloads (quando o sistema permite) ou na pasta do
-      //    app (sempre permitida no scoped storage); o botão Compartilhar
-      //    leva o arquivo a Downloads/Drive/WhatsApp.
+      //    Abre o seletor do sistema ("Salvar como" no desktop, SAF com
+      //    pasta + nome editáveis no Android) e grava o .txt escolhido.
+      //    Se o diálogo falhar no Android, o comando Rust salva em
+      //    Downloads ou na pasta do app — e o botão Compartilhar leva o
+      //    arquivo a Downloads/Drive/WhatsApp.
       if (isTauriRuntime()) {
         const res = await saveTextFileNative(filename, contentToSave);
         if (res.ok) {
@@ -3040,7 +3040,7 @@ export default function GematriaCalculator() {
           >
             <h4 className="text-sm font-bold text-white font-display">Salvar busca (.txt)</h4>
             <p className="text-[11px] text-neutral-400 leading-relaxed">
-              Edite o nome se quiser. Ao confirmar, {isAndroid() && isTauriRuntime() ? "o arquivo é salvo no aparelho (Downloads ou pasta do app) e você pode compartilhá-lo em seguida." : isTauriRuntime() ? "o explorador do sistema abre para você escolher a pasta." : "o navegador abre o explorador para você escolher a pasta."}
+              Edite o nome se quiser. Ao confirmar, {isTauriRuntime() ? "o seletor do sistema abre para você escolher a pasta (no Android, o nome pode ser editado no próprio seletor)." : "o navegador abre o explorador para você escolher a pasta."}
             </p>
             <label className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider block">
               Nome do arquivo

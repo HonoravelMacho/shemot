@@ -42,6 +42,34 @@
       "description": "Wordlist de formas plenas para filtrar combinações geradas. Sem descrições (verbetes curados continuam no dicionário hermético embutido).",
       "source": "wordlist 'spanish' do sistema (wspanish)",
       "license": "Ver dictionaries/es/README.md"
+    },
+    {
+      "id": "el",
+      "name": "Grego Moderno (filtro)",
+      "lang": "el",
+      "alphabet": "Grego",
+      "kind": "filter",
+      "version": "1.0.0",
+      "file": "el/words.txt",
+      "entries": 329375,
+      "normalization": "lowercase + NFD sem diacríticos + ς→σ (α-ω)",
+      "description": "Wordlist de formas plenas para filtrar combinações geradas (só ≤10 letras, limite do motor). Sem descrições (verbetes curados continuam no dicionário hermético embutido).",
+      "source": "hunspell-el (Modern Greek, formas plenas do .dic)",
+      "license": "Ver dictionaries/el/README.md"
+    },
+    {
+      "id": "koine",
+      "name": "Grego Koiné — Novo Testamento (filtro)",
+      "lang": "grc",
+      "alphabet": "Grego",
+      "kind": "filter",
+      "version": "1.0.0",
+      "file": "koine/words.txt",
+      "entries": 20517,
+      "normalization": "lowercase + NFD sem diacríticos + ς→σ (α-ω)",
+      "description": "Vocabulário do NT (formas + lemas) para filtrar combinações geradas. Sem descrições (verbetes curados continuam no dicionário hermético embutido).",
+      "source": "MorphGNT SBLGNT Edition (Tauber 2017); texto sob SBLGNT EULA, morfologia CC-BY-SA 3.0",
+      "license": "Ver dictionaries/koine/README.md"
     }
   ]
 }
