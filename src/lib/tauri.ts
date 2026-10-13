@@ -24,7 +24,18 @@ export interface SearchProgress {
 
 export function isAndroid(): boolean {
   if (typeof navigator === "undefined") return false;
-  return /android/i.test(navigator.userAgent);
+  const ua = navigator.userAgent || "";
+  if (/android/i.test(ua)) return true;
+  // WebViews antigas podem omitir "Android" do UA: heurística de fallback
+  // (Linux + touchscreen + sem X11 típico de desktop).
+  if (/linux/i.test(ua) && !/x11/i.test(ua)) {
+    try {
+      if (navigator.maxTouchPoints > 0 && window.screen.width < 1200) return true;
+    } catch {
+      /* noop */
+    }
+  }
+  return false;
 }
 
 export interface SaveResult {
@@ -38,8 +49,11 @@ export interface SaveResult {
 /**
  * Salva um .txt via APIs nativas do Tauri.
  * - Desktop: diálogo "Salvar como" (plugin-dialog) + escrita (plugin-fs).
- * - Android: WebView não tem download; tenta gravar em Downloads
- *   (pode falhar por scoped storage) com fallback para a pasta do app.
+ * - Android: comando Rust `save_text_file_native` — tenta Downloads público
+ *   e cai para a pasta privada do app (scoped storage do Android 10+ barra
+ *   escrita direta em Downloads; a pasta do app é sempre gravável).
+ *   A UI deve oferecer "Compartilhar" (shareTextAsFile) para levar o
+ *   arquivo a Downloads/Drive/WhatsApp a partir da pasta do app.
  * Retorna ok:false para a UI oferecer o fallback de copiar o texto.
  */
 export async function saveTextFileNative(
@@ -59,17 +73,21 @@ export async function saveTextFileNative(
       return { ok: true, path, error: "" };
     }
 
-    const { downloadDir, join } = await import("@tauri-apps/api/path");
-    const { writeTextFile, BaseDirectory } = await import(
-      "@tauri-apps/plugin-fs"
-    );
+    // Android (Tauri): comando Rust com fallback interno
+    // Downloads → pasta do app. Nunca usa o diálogo (inexistente no mobile).
     try {
-      const full = await join(await downloadDir(), filename);
-      await writeTextFile(full, contents);
-      return { ok: true, path: full, error: "" };
+      const { invoke } = await import("@tauri-apps/api/core");
+      const path = await invoke<string>("save_text_file_native", {
+        filename,
+        contents,
+      });
+      return { ok: true, path, error: "" };
     } catch (e) {
-      // Scoped storage (Android 10+) pode barrar Downloads público:
-      // grava na pasta privada do app, sempre permitida.
+      // Fallback direto via plugin-fs (pasta privada, sempre permitida
+      // após a capability $APPDATA/**).
+      const { writeTextFile, BaseDirectory } = await import(
+        "@tauri-apps/plugin-fs"
+      );
       await writeTextFile(filename, contents, {
         baseDir: BaseDirectory.AppData,
       });
@@ -77,6 +95,48 @@ export async function saveTextFileNative(
     }
   } catch (e) {
     return { ok: false, path: "", error: String(e) };
+  }
+}
+
+/** O Web Share API com arquivos está disponível? (Android Chrome/WebView.) */
+export function canShareFiles(): boolean {
+  try {
+    if (typeof navigator === "undefined" || !("share" in navigator)) return false;
+    if (typeof File === "undefined") return false;
+    const nav = navigator as Navigator & {
+      canShare?: (data: { files: File[] }) => boolean;
+    };
+    if (typeof nav.canShare === "function") {
+      return nav.canShare({
+        files: [new File([""], "teste.txt", { type: "text/plain" })],
+      });
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Abre o seletor nativo de compartilhamento (Downloads, Drive, WhatsApp…)
+ * com o conteúdo como anexo .txt. Retorna true se o sheet abriu.
+ */
+export async function shareTextAsFile(
+  filename: string,
+  contents: string,
+): Promise<boolean> {
+  try {
+    if (typeof navigator === "undefined" || !("share" in navigator)) return false;
+    const file = new File([contents], filename, { type: "text/plain" });
+    await (navigator as Navigator & { share: (d: unknown) => Promise<void> }).share({
+      files: [file],
+      title: filename,
+    });
+    return true;
+  } catch (e) {
+    // AbortError = usuário fechou o sheet: considera "ok, sem erro".
+    if (e instanceof DOMException && e.name === "AbortError") return true;
+    return false;
   }
 }
 export function isTauriRuntime(): boolean {

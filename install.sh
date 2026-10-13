@@ -14,8 +14,8 @@ echo -e "${BLUE}    🕯️  INSTALANDO MOTOR DE GEMATRIA SHEMOT  🕯️    ${N
 echo -e "${BLUE}===================================================${NC}"
 
 # 1. Definir e garantir a pasta de destino correta
-TARGET_DIR="$HOME/shemot-gematria-calculator"
-REPO_URL="https://github.com/HonoravelMacho/shemot-gematria-calculator.git"
+TARGET_DIR="$HOME/shemot"
+REPO_URL="https://github.com/HonoravelMacho/shemot.git"
 
 if [ -d "$TARGET_DIR" ]; then
     echo -e "${YELLOW}🔄 Pasta do Shemot já existe no seu computador.${NC}"
@@ -30,7 +30,7 @@ else
         cd "$TARGET_DIR" || exit 1
     else
         echo -e "${RED}❌ Erro: Não foi possível clonar o repositório.${NC}"
-        echo -e "Verifique sua conexão com a internet ou se o nome do repositório no seu perfil está como: ${YELLOW}shemot-gematria-calculator${NC}"
+        echo -e "Verifique sua conexão com a internet ou se o nome do repositório no seu perfil está como: ${YELLOW}shemot${NC}"
         exit 1
     fi
 fi

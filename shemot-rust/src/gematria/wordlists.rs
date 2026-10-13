@@ -125,6 +125,12 @@ mod tests {
     }
 
     #[test]
+    fn registry_embeds_en_es() {
+        assert!(wordlist_ids().contains(&"en"));
+        assert!(wordlist_ids().contains(&"es"));
+    }
+
+    #[test]
     fn ptbr_contains_common_words() {
         assert!(wordlist_contains("pt-BR", "AMOR"));
         assert!(wordlist_contains("pt-BR", "coração"));
@@ -138,5 +144,16 @@ mod tests {
         let m = matched_wordlists("DEUS");
         assert!(m.contains(&"pt-BR".to_string()));
         assert!(matched_wordlists("XQZKWJQQ").is_empty());
+    }
+
+    #[test]
+    fn en_es_contain_common_words() {
+        assert!(wordlist_contains("en", "LOVE"));
+        assert!(wordlist_contains("en", "god"));
+        assert!(wordlist_contains("en", "Wisdom (WISDOM)"));
+        assert!(wordlist_contains("es", "AMOR"));
+        assert!(wordlist_contains("es", "corazón"));
+        assert!(!wordlist_contains("en", "XQZKWJQQ"));
+        assert!(!wordlist_contains("es", "XQZKWJQQ"));
     }
 }

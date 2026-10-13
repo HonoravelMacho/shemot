@@ -7,10 +7,10 @@ import { useState, useRef, useEffect } from "react";
 import { 
   Play, Download, Trash2, Cpu, Sparkles, Filter, 
   HelpCircle, Settings, ChevronRight, CheckCircle, Flame,
-  Book, Search, Copy, Check, Info, Square
+  Book, Search, Copy, Check, Info, Square, Share2
 } from "lucide-react";
 import { AlphabetType, LatinoEstilo, LatinoAvancado, SearchStats } from "../types";
-import { invokeSearch, invokeCancel, listenProgress, isTauriRuntime, saveTextFileNative } from "../lib/tauri";
+import { invokeSearch, invokeCancel, listenProgress, isTauriRuntime, isAndroid, saveTextFileNative, canShareFiles, shareTextAsFile } from "../lib/tauri";
 import {
   fetchRegistry, wordlistsForAlphabet, loadWordlist, wordlistContains,
   type WordlistEntry,
@@ -1780,6 +1780,9 @@ export default function GematriaCalculator() {
   const [exportMsg, setExportMsg] = useState<string | null>(null);
   const [showExportModal, setShowExportModal] = useState<boolean>(false);
   const [exportText, setExportText] = useState<string>("");
+  // Último arquivo salvo no Android (para o botão Compartilhar).
+  const [lastSaved, setLastSaved] = useState<{ filename: string; content: string } | null>(null);
+  const [isSharing, setIsSharing] = useState<boolean>(false);
   // Diálogo "Salvar como" próprio: nome editável + explorador gráfico.
   const [showSaveDialog, setShowSaveDialog] = useState<boolean>(false);
   const [saveFilename, setSaveFilename] = useState<string>("");
@@ -1890,12 +1893,19 @@ export default function GematriaCalculator() {
     try {
       // 1) Runtime Tauri (desktop + Android): salvamento nativo.
       //    No desktop o plugin-dialog abre o explorador "Salvar como" com
-      //    o nome sugerido (editável lá também). No Android gravamos em
-      //    Downloads com o nome escolhido (WebView não tem <a download>).
+      //    o nome sugerido (editável lá também). No Android o comando Rust
+      //    grava em Downloads (quando o sistema permite) ou na pasta do
+      //    app (sempre permitida no scoped storage); o botão Compartilhar
+      //    leva o arquivo a Downloads/Drive/WhatsApp.
       if (isTauriRuntime()) {
         const res = await saveTextFileNative(filename, contentToSave);
         if (res.ok) {
-          setExportMsg(`Arquivo salvo em: ${res.path}`);
+          if (isAndroid()) {
+            setLastSaved({ filename, content: contentToSave });
+            setExportMsg(`Arquivo salvo em: ${res.path} — use Compartilhar para enviar a Downloads/Drive.`);
+          } else {
+            setExportMsg(`Arquivo salvo em: ${res.path}`);
+          }
           setShowSaveDialog(false);
           return;
         }
@@ -2836,8 +2846,26 @@ export default function GematriaCalculator() {
 
           {/* Export feedback (caminho salvo / instruções Android) */}
           {exportMsg && (
-            <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2 text-[11px] text-amber-300 font-mono break-all">
-              {exportMsg}
+            <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2 text-[11px] text-amber-300 font-mono break-all flex items-center justify-between gap-2">
+              <span className="flex-1">{exportMsg}</span>
+              {lastSaved && canShareFiles() && (
+                <button
+                  onClick={async () => {
+                    setIsSharing(true);
+                    try {
+                      const ok = await shareTextAsFile(lastSaved.filename, lastSaved.content);
+                      if (!ok) setExportMsg("Compartilhamento indisponível — o arquivo continua salvo no caminho acima.");
+                    } finally {
+                      setIsSharing(false);
+                    }
+                  }}
+                  disabled={isSharing}
+                  className="shrink-0 min-h-[36px] px-3 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-neutral-950 font-bold rounded-lg text-[11px] flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Share2 className="h-3.5 w-3.5" />
+                  {isSharing ? "Abrindo…" : "Compartilhar"}
+                </button>
+              )}
             </div>
           )}
 
@@ -3012,7 +3040,7 @@ export default function GematriaCalculator() {
           >
             <h4 className="text-sm font-bold text-white font-display">Salvar busca (.txt)</h4>
             <p className="text-[11px] text-neutral-400 leading-relaxed">
-              Edite o nome se quiser. Ao confirmar, {isTauriRuntime() ? "o explorador do sistema abre para você escolher a pasta." : "o navegador abre o explorador para você escolher a pasta."}
+              Edite o nome se quiser. Ao confirmar, {isAndroid() && isTauriRuntime() ? "o arquivo é salvo no aparelho (Downloads ou pasta do app) e você pode compartilhá-lo em seguida." : isTauriRuntime() ? "o explorador do sistema abre para você escolher a pasta." : "o navegador abre o explorador para você escolher a pasta."}
             </p>
             <label className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider block">
               Nome do arquivo
@@ -3073,6 +3101,24 @@ export default function GematriaCalculator() {
                 <Copy className="h-4 w-4" />
                 Copiar tudo
               </button>
+              {canShareFiles() && (
+                <button
+                  onClick={async () => {
+                    setIsSharing(true);
+                    try {
+                      const name = sanitizeFilename(saveFilename) || "shemot_busca.txt";
+                      await shareTextAsFile(name, exportText);
+                    } finally {
+                      setIsSharing(false);
+                    }
+                  }}
+                  disabled={isSharing}
+                  className="flex-1 min-h-[48px] bg-neutral-700 hover:bg-neutral-600 disabled:opacity-50 text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2"
+                >
+                  <Share2 className="h-4 w-4" />
+                  {isSharing ? "Abrindo…" : "Compartilhar"}
+                </button>
+              )}
               <button
                 onClick={() => setShowExportModal(false)}
                 className="min-h-[48px] px-5 bg-neutral-800 hover:bg-neutral-700 text-white font-semibold rounded-xl text-sm"

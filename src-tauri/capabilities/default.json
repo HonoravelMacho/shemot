@@ -10,7 +10,27 @@
     "dialog:allow-save",
     {
       "identifier": "fs:allow-write-text-file",
-      "allow": [{ "path": "$HOME/**" }, { "path": "$DOWNLOAD/**" }, { "path": "$DOCUMENT/**" }]
-    }
+      "allow": [
+        { "path": "$HOME/**" },
+        { "path": "$DOWNLOAD/**" },
+        { "path": "$DOCUMENT/**" },
+        { "path": "$APPDATA/**" },
+        { "path": "$APPLOCALDATA/**" },
+        { "path": "$APPCACHE/**" }
+      ]
+    },
+    {
+      "identifier": "fs:allow-read-text-file",
+      "allow": [
+        { "path": "$HOME/**" },
+        { "path": "$DOWNLOAD/**" },
+        { "path": "$DOCUMENT/**" },
+        { "path": "$APPDATA/**" },
+        { "path": "$APPLOCALDATA/**" },
+        { "path": "$APPCACHE/**" }
+      ]
+    },
+    "fs:allow-exists",
+    "fs:allow-mkdir"
   ]
 }

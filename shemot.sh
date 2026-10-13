@@ -4,7 +4,7 @@
 # Este script atualiza o repositório, instala as dependências se necessário e inicia o Shemot.
 
 # Detectar se estamos dentro da pasta do shemot ou se precisamos entrar nela
-TARGET_DIR="shemot-gematria-calculator"
+TARGET_DIR="shemot"
 
 if [ -d "$TARGET_DIR" ]; then
     echo "⚙️  Entrando na pasta $TARGET_DIR..."
@@ -15,7 +15,7 @@ else
     # Se o usuário rodou o script de fora e a pasta não existe, tenta clonar se houver internet
     echo "⚠️  Pasta do Shemot não encontrada localmente."
     echo "⚙️  Tentando clonar o repositório do GitHub..."
-    git clone https://github.com/HonoravelMacho/shemot-gematria-calculator.git
+    git clone https://github.com/HonoravelMacho/shemot.git
     if [ $? -eq 0 ]; then
         cd "$TARGET_DIR"
     else

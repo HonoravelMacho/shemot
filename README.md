@@ -49,7 +49,7 @@ A arquitetura foi desenhada priorizando modularidade, carregamento imediato offl
 Para clonar, instalar todas as dependências, atualizar automaticamente e criar o comando prático `shemot` para poder iniciar de qualquer pasta do seu terminal, basta copiar e colar o comando de linha única abaixo:
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/HonoravelMacho/shemot-gematria-calculator/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/HonoravelMacho/shemot/main/install.sh | bash
 ```
 
 > **Dica**: Após o script completar, reinicie o terminal ou digite `source ~/.bashrc` (ou `source ~/.zshrc`) para carregar o apelido. A partir daí, basta digitar **`shemot`** de qualquer lugar para jogar a plataforma no navegador!
@@ -62,8 +62,8 @@ Siga o passo a passo abaixo se preferir executar manualmente em seu ambiente de 
 
 ### 1. Clonar o Repositório
 ```bash
-git clone https://github.com/HonoravelMacho/shemot-gematria-calculator.git
-cd shemot-gematria-calculator
+git clone https://github.com/HonoravelMacho/shemot.git
+cd shemot
 ```
 
 ### 2. Instalar as Dependências

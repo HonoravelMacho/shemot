@@ -14,6 +14,34 @@
       "description": "Wordlist de formas plenas para filtrar combinações geradas. Sem descrições (verbetes curados continuam no dicionário hermético embutido).",
       "source": "wordlist 'brazilian' do sistema (ispell/wbrazilian, DFSG-free)",
       "license": "Ver dictionaries/pt-BR/README.md"
+    },
+    {
+      "id": "en",
+      "name": "English (filtro)",
+      "lang": "en",
+      "alphabet": "Latino",
+      "kind": "filter",
+      "version": "1.0.0",
+      "file": "en/words.txt",
+      "entries": 75144,
+      "normalization": "lowercase + NFD sem diacríticos (a-z)",
+      "description": "Wordlist de formas plenas para filtrar combinações geradas. Sem descrições (verbetes curados continuam no dicionário hermético embutido).",
+      "source": "wordlists 'american-english' + 'british-english' do sistema (wamerican/wbritish, mescladas com deduplicação)",
+      "license": "Ver dictionaries/en/README.md"
+    },
+    {
+      "id": "es",
+      "name": "Español (filtro)",
+      "lang": "es",
+      "alphabet": "Latino",
+      "kind": "filter",
+      "version": "1.0.0",
+      "file": "es/words.txt",
+      "entries": 85649,
+      "normalization": "lowercase + NFD sem diacríticos (a-z)",
+      "description": "Wordlist de formas plenas para filtrar combinações geradas. Sem descrições (verbetes curados continuam no dicionário hermético embutido).",
+      "source": "wordlist 'spanish' do sistema (wspanish)",
+      "license": "Ver dictionaries/es/README.md"
     }
   ]
 }

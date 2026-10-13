@@ -7,6 +7,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use serde::Serialize;
 use tauri::Emitter;
+use tauri::Manager;
 
 use gematria::{
     backtrack_latino_etimologico, backtrack_latino_custom,
@@ -42,6 +43,53 @@ struct RichResult {
 #[tauri::command]
 fn cancel_search(state: tauri::State<AppState>) {
     state.cancel_flag.store(true, Ordering::Relaxed);
+}
+
+/// Salva um .txt de forma confiável em todas as plataformas.
+///
+/// Por que existe: no Android 10+ (scoped storage) a WebView não tem
+/// `<a download>` e a escrita direta em Downloads público via plugin-fs
+/// é barrada. A pasta privada do app (`app_data_dir`), por outro lado,
+/// é sempre gravável — no desktop equivale a ~/.local/share, no Android
+/// a /data/data/<pkg>/files (visível via "Compartilhar" na UI).
+/// Estratégia: tenta Downloads público primeiro (funciona no desktop e
+/// em Androids antigos); se falhar, grava na pasta do app.
+#[tauri::command]
+fn save_text_file_native(
+    app: tauri::AppHandle,
+    filename: String,
+    contents: String,
+) -> Result<String, String> {
+    let mut safe: String = filename
+        .chars()
+        .map(|c| match c {
+            '/' | '\\' | ':' | '*' | '?' | '"' | '<' | '>' | '|' => '_',
+            c => c,
+        })
+        .collect();
+    safe = safe.trim().replace(|c: char| c.is_whitespace(), "_");
+    if safe.is_empty() {
+        safe = "shemot_busca.txt".to_string();
+    }
+    if !safe.to_lowercase().ends_with(".txt") {
+        safe.push_str(".txt");
+    }
+
+    // 1) Tenta a pasta pública de Downloads (desktop + Android antigo).
+    if let Ok(download_dir) = app.path().download_dir() {
+        let dest = download_dir.join(&safe);
+        if std::fs::write(&dest, &contents).is_ok() {
+            return Ok(dest.to_string_lossy().to_string());
+        }
+    }
+
+    // 2) Fallback garantido: pasta privada do app (sempre gravável,
+    // inclusive com scoped storage do Android 10+).
+    let data_dir = app.path().app_data_dir().map_err(|e| e.to_string())?;
+    std::fs::create_dir_all(&data_dir).map_err(|e| e.to_string())?;
+    let dest = data_dir.join(&safe);
+    std::fs::write(&dest, &contents).map_err(|e| e.to_string())?;
+    Ok(dest.to_string_lossy().to_string())
 }
 
 #[tauri::command]
@@ -373,7 +421,8 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             run_gematria_search,
             cancel_search,
-            quick_lookup_dictionary
+            quick_lookup_dictionary,
+            save_text_file_native
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
