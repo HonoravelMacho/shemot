@@ -44,6 +44,20 @@
       "license": "Ver dictionaries/es/README.md"
     },
     {
+      "id": "de",
+      "name": "Alemão (filtro)",
+      "lang": "de-DE",
+      "alphabet": "Latino",
+      "kind": "filter",
+      "version": "1.0.0",
+      "file": "de/words.txt",
+      "entries": 164691,
+      "normalization": "lowercase + NFD sem diacríticos + ß→ss (a-z; palavras com ß também entram na forma original)",
+      "description": "Wordlist de lemas do .dic frami (hunspell de_DE) para filtrar combinações geradas. Sem descrições (verbetes curados continuam no dicionário hermético embutido).",
+      "source": "hunspell de_DE_frami (LibreOffice/dictionaries; igerman98 + add-ons de Franz Michael Baumann, 20161207+frami20170109)",
+      "license": "igerman98/frami GPLv3 — ver dictionaries/de/README.md"
+    },
+    {
       "id": "el",
       "name": "Grego Moderno (filtro)",
       "lang": "el",

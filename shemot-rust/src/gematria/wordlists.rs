@@ -239,6 +239,19 @@ mod tests {
     }
 
     #[test]
+    fn de_contains_common_words() {
+        assert!(wordlist_contains("de", "LIEBE"));
+        assert!(wordlist_contains("de", "gott"));
+        assert!(wordlist_contains("de", "Weisheit (WEISHEIT)"));
+        // ß: casa tanto com ss quanto com a forma original
+        assert!(wordlist_contains("de", "Straße"));
+        assert!(wordlist_contains("de", "strasse"));
+        // diacríticos são normalizados no match
+        assert!(wordlist_contains("de", "mädchen"));
+        assert!(!wordlist_contains("de", "XQZKWJQQ"));
+    }
+
+    #[test]
     fn el_koine_contain_common_words() {
         // Koiné (SBLGNT): Jo 1.1 — consulta politônica e monotônica casam.
         assert!(wordlist_contains("koine", "ΛΟΓΟΣ"));
