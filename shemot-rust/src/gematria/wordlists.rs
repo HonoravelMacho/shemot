@@ -239,6 +239,18 @@ mod tests {
     }
 
     #[test]
+    fn fr_it_contain_common_words() {
+        assert!(wordlist_contains("fr", "AMOUR"));
+        assert!(wordlist_contains("fr", "croissant"));
+        assert!(wordlist_contains("fr", "Château (CHATEAU)"));
+        assert!(wordlist_contains("it", "AMORE"));
+        assert!(wordlist_contains("it", "spaghetto"));
+        assert!(wordlist_contains("it", "Città"));
+        assert!(!wordlist_contains("fr", "XQZKWJQQ"));
+        assert!(!wordlist_contains("it", "XQZKWJQQ"));
+    }
+
+    #[test]
     fn de_contains_common_words() {
         assert!(wordlist_contains("de", "LIEBE"));
         assert!(wordlist_contains("de", "gott"));

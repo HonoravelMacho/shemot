@@ -58,6 +58,34 @@
       "license": "igerman98/frami GPLv3 — ver dictionaries/de/README.md"
     },
     {
+      "id": "fr",
+      "name": "Français (filtro)",
+      "lang": "fr",
+      "alphabet": "Latino",
+      "kind": "filter",
+      "version": "1.0.0",
+      "file": "fr/words.txt",
+      "entries": 74194,
+      "normalization": "lowercase + NFD sem diacríticos (a-z)",
+      "description": "Wordlist de formas-base (lemas, com flexões presentes no .dic) para filtrar combinações geradas. Sem descrições (verbetes curados continuam no dicionário hermético embutido).",
+      "source": "hunspell fr_FR (Dicollecte; LibreOffice/dictionaries), entradas alfabéticas deduplicadas, sem unmunch (expansão completa ficaria inviável)",
+      "license": "MPL-2.0 — ver dictionaries/fr/README.md"
+    },
+    {
+      "id": "it",
+      "name": "Italiano (filtro)",
+      "lang": "it",
+      "alphabet": "Latino",
+      "kind": "filter",
+      "version": "1.0.0",
+      "file": "it/words.txt",
+      "entries": 94282,
+      "normalization": "lowercase + NFD sem diacríticos (a-z)",
+      "description": "Wordlist de formas-base (lemas, com flexões presentes no .dic) para filtrar combinações geradas. Sem descrições (verbetes curados continuam no dicionário hermético embutido).",
+      "source": "hunspell it_IT (LibreOffice/dictionaries), entradas alfabéticas deduplicadas, sem unmunch (expansão completa ficaria inviável)",
+      "license": "MPL-2.0 — ver dictionaries/it/README.md"
+    },
+    {
       "id": "el",
       "name": "Grego Moderno (filtro)",
       "lang": "el",
