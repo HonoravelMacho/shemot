@@ -1,4 +1,43 @@
-# Shemot - Gematria Calculator & Combinatorial Search Engine 🔱
+
+# Shemot (שְׁמוֹת) 📜
+
+> Software para análise de valores posicionais relativos em alfabetos latino, grego e hebraico.
+
+## 🛠️ Antes de conhecer o projeto, me conheça 
+
+# 👋 Além do Código: Quem está por trás do Shemot?
+
+> *Se você chegou até aqui através do app de relacionamentos Verbo, seja bem-vinda!*
+
+### Resposta de oração (ou só um instrumento dela)
+Atualmente não estou buscando e nem orando por um relacionamento. Mas entendi que, às vezes, a gente precisa se colocar onde Deus possa nos usar — e talvez eu esteja aqui para ser a resposta da oração de alguém.
+
+Estou solteiro há 7 anos. Não sofro de solidão porque aprecio a solitude e sei que nunca estou só, mas sempre acompanhado pelos anjos de Deus. Estou em paz com meu momento, mas totalmente aberto ao agir do Senhor.
+
+### ✝️ Caminhada & Ministério
+Trabalho como cuidador de idosos na clínica da minha família, sou formado em Massoterapia e estou no último semestre do Bacharelado em Educação Física.
+
+Fui o primeiro *OYIM* da antiga ASR a atuar no território da USB (3ª edição mundial) e atuei como obreiro bíblico contratado pela DSA em Santa Maria. Hoje, sirvo como líder distrital de Jovens e Evangelismo (Rolante e Riozinho), diretor de Jovens da Central de Rolante, capelão do Clube de Desbravadores Andorinhas e diretor do Ministério de Publicações.
+
+Gosto muito de pregar (especialmente sobre Daniel, Apocalipse e Santuário) e este ano cheguei a fazer duas semanas de oração consecutivas em igrejas diferentes. Se você não sabe pregar, não tem problema; se quiser aprender, eu te ajudo com o maior prazer! (A cantar não garanto kkkk).
+
+### 🌿 Lazer & Estilo de Vida
+* **Mato > Shopping:** Prefiro mil vezes um trekking em um matagal desconhecido, cascatas, cavernas e cânions do que aglomerações urbanas.
+* **Demonstração de Afeto:** Não tenho problema em andar de mãos dadas em público; meu desafio é que, por lidar com pessoas o dia todo no trabalho/ministério, no lazer prefiro a tranquilidade da natureza.
+* **Alimentação:** Como de tudo o que seja biblicamente aprovado por Deus. Sem frescuras. 
+
+### 💻 Projetos & Poesia
+Tenho bem mais *commits* no GitHub do que *posts* no Instagram. Além do **Shemot**, criei o **Tsayad** (CLI em Python para busca de padrões no Antigo Testamento, onde descobri que o número 666 aparece em 24 situações no texto hebraico). Também aprecio poesia e sou antologista desde 2016.
+
+### 🤝 O que busco
+Não procuro alguém para preencher um vazio, mas uma parceira de caminhada: humilde, fiel a Deus e disposta a trabalhar no ministério até Jesus voltar.
+
+Se quiser conversar: **(51) 98921-3483** (WhatsApp).
+
+eu pretendo usar esse app chamado shemot para escolher o nome dos meus futuros filhos e filhas
+
+
+# Shemot - Gematria Calculator & Combinatorial  🔱
 
 **Shemot** (do hebraico שֵׁמוֹת, "Nomes") é uma plataforma interativa de alto polimento visual inspirada em painéis analíticos retrô e terminais cibernéticos antigos. Ela foi projetada para estudantes, pesquisadores e entusiastas da Gematria (Hebrea, Grega e Latina), permitindo calcular correspondências numéricas, realizar buscas combinatórias em massa e consultar significados místicos arquetípicos integrados de forma totalmente offline.
 
